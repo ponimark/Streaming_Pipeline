@@ -29,10 +29,10 @@ def main():
     try:
         logger.info("************ CONNECTING TO DATABASE *******************")
         df = spark.read.format('jdbc') \
-            .option('url', 'jdbc:postgresql://localhost:5432/postgres') \
+            .option('url', 'jdbc:postgresql://localhost:5432/your_db') \
             .option('dbtable', 'apple_app_aggregates') \
             .option('user', 'postgres') \
-            .option('password', 'poni') \
+            .option('password', '') \
             .option('driver', 'org.postgresql.Driver') \
             .load()
     except Exception as e:
