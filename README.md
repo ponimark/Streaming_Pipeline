@@ -56,9 +56,7 @@ This project implements a real-time data pipeline using **Apache Flink (PyFlink)
 ## 🛠️ Project Setup Details
 
 - **PostgreSQL** is running locally on the host machine.
-  - Connection URL: `jdbc:postgresql://host.docker.internal:5432/postgres`
-  - Username: `postgres`
-  - Password: `poni`
+  - Connection URL: `jdbc:postgresql://host.docker.internal:5432/your_db`
 
 - **Apache Flink** and **Apache Kafka** are running inside Docker containers.
 
