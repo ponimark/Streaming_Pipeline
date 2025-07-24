@@ -1,0 +1,67 @@
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+
+  kafka:
+    container_name: 'kafka'
+    image: confluentinc/cp-kafka:7.2.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,DOCKER://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,DOCKER://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+  flink-jobmanager:
+    container_name: "jobmanager16"
+    image: flink-custom:1.16.0
+    command: jobmanager
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./flink_jobs:/opt/flink/jobs
+      - ./docs:/opt/docs
+    environment:
+      JOB_MANAGER_RPC_ADDRESS: flink-jobmanager
+
+  flink-taskmanager:
+    container_name: "taskmanager16"
+    image: flink-custom:1.16.0
+    depends_on:
+      - flink-jobmanager
+    command: taskmanager
+    volumes:
+      - ./flink_jobs:/opt/flink/jobs
+      - ./docs:/opt/flink/jobs/docs
+    environment:
+      JOB_MANAGER_RPC_ADDRESS: flink-jobmanager
+      TASK_MANAGER_NUMBER_OF_TASK_SLOTS: 15
+      parallelism.default: 3
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+
+volumes:
+  kafka_data:
+  zookeeper_data:
+  zookeeper_log:
