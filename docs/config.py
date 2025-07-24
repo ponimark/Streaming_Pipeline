@@ -2,7 +2,7 @@
 MYSQL_CONFIG = {
     "host": "localhost",
     "user": "root",             # change if different
-    "password": "poni",  # change to your MySQL password
+    "password": "",  # change to your MySQL password
     "database": "de"
 }
 
@@ -10,7 +10,7 @@ POSTGRES_CONFIG = {
     "host": "localhost",
     "port": 5432,
     "user": "postgres",          # will be used later (Flink writes here)
-    "password": "poni",
+    "password": "",
     "database": "postgres"
 }
 
