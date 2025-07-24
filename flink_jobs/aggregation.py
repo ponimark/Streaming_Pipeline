@@ -38,11 +38,11 @@ def create_aggregation_sink_table(t_env):
             PRIMARY KEY (user_id, device, session_start, session_end) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
-            'url' = 'jdbc:postgresql://host.docker.internal:5432/postgres',
+            'url' = 'jdbc:postgresql://host.docker.internal:5432/your_db',
             'table-name' = 'apple_app_aggregates',
             'driver' = 'org.postgresql.Driver',
             'username' = 'postgres',
-            'password' = 'poni'
+            'password' = ''
         )
         """
     t_env.execute_sql(ddl)
