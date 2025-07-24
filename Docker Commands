@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# ------------------------------------------------------
+# Script to Start Streaming Pipeline (Kafka + Flink + Postgres)
+# PostgreSQL is on the host machine
+# Kafka & Flink are in Docker containers
+# ------------------------------------------------------
+
+# STEP 1: Start Kafka, Zookeeper, Flink containers in background
+echo "🔁 Starting Docker services (Kafka, Zookeeper, Flink)..."
+docker compose up -d
+
+# STEP 2: Show container status
+echo "📋 Listing Docker containers..."
+docker compose ps
+
+# TIP: If you made changes to flink_job.py, copy it into the Flink container
+# Get container name if unsure: docker ps
+FLINK_CONTAINER_NAME="flink-jobmanager"
+FLINK_JOB_PATH_LOCAL="flink_job.py"
+FLINK_JOB_PATH_CONTAINER="/opt/flink/jobs/flink_job.py"
+
+echo "📂 Copying updated Flink job to Flink container..."
+docker cp $FLINK_JOB_PATH_LOCAL $FLINK_CONTAINER_NAME:$FLINK_JOB_PATH_CONTAINER
+
+# STEP 3: Run the Flink Python job from inside the JobManager container
+# This needs to be done every time you update the flink_job.py
+echo "🚀 Running Flink job inside container..."
+docker compose exec $FLINK_CONTAINER_NAME flink run -py $FLINK_JOB_PATH_CONTAINER
+
+# STEP 4: Tail logs for debugging (optional)
+# echo "📡 Streaming logs from Flink jobmanager..."
+# docker compose logs -f flink-jobmanager
+
+# STEP 5: PostgreSQL is running locally. Connect using your client:
+# psql -h localhost -p 5432 -U postgres -d postgres
+# Password: poni
+
+# -----------------------------
+# EXTRA UTILITY COMMANDS
+# -----------------------------
+
+# Restart Flink jobmanager only:
+# docker compose restart flink-jobmanager
+
+# Restart all services:
+# docker compose restart
+
+# Stop and clean all containers, networks:
+# docker compose down
+
+# Clean unused volumes, containers, and networks:
+# docker system prune
